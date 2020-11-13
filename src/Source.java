@@ -14,9 +14,6 @@ public class Source {
         nextRequestNumber = 0;
     }
 
-   /* public Request generate(double time) {
-        return new Request(number, time);
-    }*/
 
     public Pair<Double, Request> generate(double currentTime) {
         double nextRequestTime = getNextRequestTime(currentTime);
