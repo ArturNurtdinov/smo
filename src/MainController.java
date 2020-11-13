@@ -40,24 +40,6 @@ public class MainController {
         deviceManager.setCurrentPackage(2);
     }
 
-    public void modulateWork() {
-        for (int i = 0; i < requestsNumber; ++i) {
-            Pair<Double, Request> nextRequestPair = sourceManager.getNextRequest(currentTime);
-            Request nextRequest = nextRequestPair.getSecond();
-            currentTime += nextRequestPair.getFirst();
-            checkFreeDevices();
-            Main.print("Источник номер " + nextRequest.getSourceNumber() + " создал заявку в " + nextRequest.getGeneratedTime());
-
-            if (buffer.addToBuffer(nextRequest)) {
-                Main.print("Заявка добавлена без удалений");
-            } else {
-                Main.print("Заявка либо попала в буфер c замещением, либо ушла в отказ сама");
-            }
-            Main.print("На данный момент в буфере заявки от следующих источников:");
-            Main.print(buffer.getRequests().stream().filter(Objects::nonNull).map(Request::getSourceNumber).collect(Collectors.toList()));
-        }
-    }
-
     private void checkFreeDevices() {
         List<AcceptedRequest> acceptedRequests = deviceManager.getAcceptedRequests(currentTime);
         for (AcceptedRequest acceptedRequest : acceptedRequests) {
@@ -90,6 +72,20 @@ public class MainController {
     }
 
     public void start() {
-        modulateWork();
+        for (int i = 0; i < requestsNumber; ++i) {
+            Pair<Double, Request> nextRequestPair = sourceManager.getNextRequest(currentTime);
+            Request nextRequest = nextRequestPair.getSecond();
+            currentTime += nextRequestPair.getFirst();
+            checkFreeDevices();
+            Main.print("Источник номер " + nextRequest.getSourceNumber() + " создал заявку в " + nextRequest.getGeneratedTime());
+
+            if (buffer.addToBuffer(nextRequest)) {
+                Main.print("Заявка добавлена без удалений");
+            } else {
+                Main.print("Заявка либо попала в буфер c замещением, либо ушла в отказ сама");
+            }
+            Main.print("На данный момент в буфере заявки от следующих источников:");
+            Main.print(buffer.getRequests().stream().filter(Objects::nonNull).map(Request::getSourceNumber).collect(Collectors.toList()));
+        }
     }
 }
