@@ -6,12 +6,10 @@ public class DeviceManager {
     private Device[] devices;
     private int currentPackage = -1;
     private int amountOfDevices;
-    private int highestPriority;
 
     public DeviceManager(int amountOfDevices, double alpha, double beta) {
         this.devices = new Device[amountOfDevices];
         this.amountOfDevices = amountOfDevices;
-        this.highestPriority = amountOfDevices + 1;
         for (int i = 0; i < devices.length; ++i) {
             devices[i] = new Device(i, alpha, beta);
         }
