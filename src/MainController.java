@@ -51,22 +51,22 @@ public class MainController {
             }
             int packageNumber = deviceManager.getCurrentPackage();
             if (!buffer.isEmpty()) {
-
-                Request requestFromBuf;
+                Request requestForDevice;
                 if (packageNumber != -1) {
-                    requestFromBuf = buffer.get(packageNumber);
-                    if (requestFromBuf == null) {
-                        requestFromBuf = buffer.get();
-                        deviceManager.setCurrentPackage(requestFromBuf.getSourceNumber());
+                    requestForDevice = buffer.get(packageNumber);
+                    if (requestForDevice == null) {
+                        Main.print("Пакетная обработка закончилась, нужно получить новый пакет");
+                        requestForDevice = buffer.get();
+                        deviceManager.setCurrentPackage(requestForDevice.getSourceNumber());
                     }
                 } else {
-                    requestFromBuf = buffer.get();
-                    deviceManager.setCurrentPackage(requestFromBuf.getSourceNumber());
+                    requestForDevice = buffer.get();
+                    deviceManager.setCurrentPackage(requestForDevice.getSourceNumber());
                 }
 
-                int deviceNumber = deviceManager.executeRequest(requestFromBuf, currentTime);
-                Main.print("Заявка от источника номер " + requestFromBuf.getSourceNumber() +
-                        " загружена на прибор номер " + deviceNumber);
+                int deviceNumber = deviceManager.executeRequest(requestForDevice, currentTime);
+                Main.print("Заявка от источника номер " + requestForDevice.getSourceNumber() +
+                        " загружена на прибор номер " + deviceNumber + " номер обрабатываемого пакета - " + deviceManager.getCurrentPackage());
             }
         }
     }

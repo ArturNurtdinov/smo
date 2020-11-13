@@ -21,25 +21,48 @@ public class Buffer {
     }
 
     public Request get(int packageNumber) {
+        double laterTime = 0;
+        int index = -1;
         for (int i = 0; i < requests.size(); i++) {
             if (requests.get(i) != null && requests.get(i).getSourceNumber() == packageNumber) {
-                Request request = requests.get(i);
-                requests.set(i, null);
-                return request;
+                laterTime = requests.get(i).getGeneratedTime();
+                index = i;
+                break;
             }
         }
-        return null;
+        for (int i = 0; i < requests.size(); i++) {
+            if (requests.get(i) != null && requests.get(i).getSourceNumber() == packageNumber && requests.get(i).getGeneratedTime() < laterTime) {
+                index = i;
+            }
+        }
+        if (index >= 0) {
+            Request request = requests.get(index);
+            requests.set(index, null);
+            return request;
+        } else {
+            return null;
+        }
     }
 
     public Request get() {
+        int index = 0;
+        Request priorityRequest = null;
         for (int i = 0; i < requests.size(); i++) {
             if (requests.get(i) != null) {
-                Request request = requests.get(i);
-                requests.set(i, null);
-                return request;
+                priorityRequest = requests.get(i);
+                index = i;
             }
         }
-        return null;
+        for (int i = 0; i < requests.size(); i++) {
+            Request request = requests.get(i);
+            if (requests.get(i) != null && getLessPriority(request.getSourceNumber(), priorityRequest.getSourceNumber()) != request.getSourceNumber()) {
+                index = i;
+                priorityRequest = requests.get(i);
+            }
+        }
+        Request request = requests.get(index);
+        requests.set(index, null);
+        return request;
     }
 
     public boolean addToBuffer(Request request) {
@@ -48,20 +71,21 @@ public class Buffer {
             incrementPointer();
             return true;
         } else {
+            int staticPointer = indexPointer;
             for (int i = indexPointer; i < size; i++) {
                 if (requests.get(i) == null) {
-                    requests.set(indexPointer, request);
-                    incrementPointer();
+                    requests.set(i, request);
                     return true;
                 }
+                incrementPointer();
             }
 
-            for (int i = 0; i < indexPointer; i++) {
+            for (int i = 0; i < staticPointer; i++) {
                 if (requests.get(i) == null) {
-                    requests.set(indexPointer, request);
-                    incrementPointer();
+                    requests.set(i, request);
                     return true;
                 }
+                incrementPointer();
             }
 
             // reject request
@@ -85,6 +109,7 @@ public class Buffer {
             if (minimalPriority == getLessPriority(minimalPriority, request.getSourceNumber())) {
                 if (requestsWithLP.values().size() == 1) {
                     requests.set(standaloneIndex, request);
+                    indexPointer = standaloneIndex;
                     return false;
                 } else if (requestsWithLP.size() > 0) {
                     Map.Entry<Integer, Request> toReplace = null;
@@ -95,9 +120,11 @@ public class Buffer {
                     }
 
                     requests.set(toReplace.getKey(), request);
+                    indexPointer = toReplace.getKey();
                     return false;
                 }
             }
+            indexPointer = staticPointer;
             return false;
         }
     }
