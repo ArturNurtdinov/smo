@@ -1,7 +1,5 @@
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 // Д1ОЗ1 – заполнение буферной памяти «по кольцу»
@@ -14,10 +12,8 @@ public class MainController {
     private int sourceCount;
     private int deviceCount;
     private int bufferSize;
-    private Random random;
     private double alpha;
     private double beta;
-    private int requestsNumber;
     private double currentTime;
 
     private Buffer buffer;
@@ -28,10 +24,8 @@ public class MainController {
         sourceCount = BuildConfig.SOURCE_NUMBER;
         deviceCount = BuildConfig.DEVICE_NUMBER;
         bufferSize = BuildConfig.BUFFER_SIZE;
-        random = new Random();
         alpha = BuildConfig.ALPHA;
         beta = BuildConfig.BETA;
-        requestsNumber = BuildConfig.REQUESTS_NUMBER;
         currentTime = 0;
 
         sourceManager = new SourceManager(sourceCount);
@@ -72,7 +66,7 @@ public class MainController {
     }
 
     public void start() {
-        for (int i = 0; i < requestsNumber; ++i) {
+        while (currentTime < BuildConfig.TIME_LIMIT) {
             Pair<Double, Request> nextRequestPair = sourceManager.getNextRequest(currentTime);
             Request nextRequest = nextRequestPair.getSecond();
             currentTime += nextRequestPair.getFirst();
