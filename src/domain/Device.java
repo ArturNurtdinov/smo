@@ -1,3 +1,5 @@
+package domain;
+
 import java.util.Random;
 
 // П32 - равномерный.
@@ -8,7 +10,6 @@ public class Device {
     private double beta;
     private double timeFreed;
     private Random random = new Random();
-    private static int counter = 0;
 
     public Device(int number, double alpha, double beta) {
         this.number = number;
@@ -22,7 +23,6 @@ public class Device {
         double timeForExecution = getTimeForExecution();
         this.request = request;
         this.timeFreed = currentTime + timeForExecution;
-        Main.print("Взята на обработку " + counter++ + " заявка");
     }
 
     public double getTimeFreed() {

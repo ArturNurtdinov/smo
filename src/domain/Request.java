@@ -1,3 +1,5 @@
+package domain;
+
 import java.util.Objects;
 
 public class Request {
@@ -25,7 +27,7 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request{" +
+        return "domain.Request{" +
                 "sourceNumber=" + sourceNumber +
                 ", generatedTime=" + generatedTime +
                 '}';

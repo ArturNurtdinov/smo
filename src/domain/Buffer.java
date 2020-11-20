@@ -1,3 +1,5 @@
+package domain;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,7 @@ public class Buffer {
 
     public Buffer(int size) {
         this.size = size;
-        this.maxPriority = 3;
+        this.maxPriority = BuildConfig.SOURCE_NUMBER;
         indexPointer = 0;
         requests = new ArrayList<>(size);
     }
@@ -154,9 +156,9 @@ public class Buffer {
         Main.print(buffer.getRequests() + "\n");
 
         Main.print("");
-        //buffer.addToBuffer(new Request(1, 3, 3));
-        //buffer.addToBuffer(new Request(1, 4, 4));
-        //buffer.addToBuffer(new Request(1, 5, 5));
+        //buffer.addToBuffer(new domain.Request(1, 3, 3));
+        //buffer.addToBuffer(new domain.Request(1, 4, 4));
+        //buffer.addToBuffer(new domain.Request(1, 5, 5));
         Main.print(buffer.get());
         Main.print(buffer.get(2));
         Main.print(buffer.get(2));

@@ -1,3 +1,5 @@
+package domain;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +53,9 @@ public class DeviceManager {
         return currentPackage;
     }
 
+    public Device getDevice(int index) {
+        return devices[index];
+    }
 
     private Integer getMorePriority(Integer first, Integer second) {
         if (first > second) return first;

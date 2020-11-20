@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="620.0" prefWidth="829.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.ControllerAutomode">
+   <children>
+      <TableView fx:id="table" layoutX="14.0" layoutY="14.0" prefHeight="599.0" prefWidth="806.0">
+        <columns>
+          <TableColumn fx:id="objectColumn" prefWidth="173.0000057220459" text="Объект" />
+          <TableColumn fx:id="statNameColumn" prefWidth="422.1999816894531" text="Имя статистики" />
+            <TableColumn fx:id="statColumn" prefWidth="211.79998779296875" text="Значение статистики" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

@@ -1,3 +1,5 @@
+package domain;
+
 class AcceptedRequest {
     private int deviceNumber;
     private Request acceptedRequest;
