@@ -86,15 +86,17 @@ public class MainController {
                     deviceManager.setCurrentPackage(requestForDevice.getSourceNumber());
                 }
 
-                int deviceNumber = deviceManager.executeRequest(requestForDevice, currentTime);
+                double timeToPlace = Math.max(requestForDevice.getGeneratedTime(), acceptedRequest.getTimeAccept());
+
+                int deviceNumber = deviceManager.executeRequest(requestForDevice, timeToPlace);
                 totalTimeOnDevice.put(requestForDevice.getSourceNumber(), totalTimeOnDevice.getOrDefault(requestForDevice.getSourceNumber(), 0.0)
-                        + deviceManager.getDevice(deviceNumber).getTimeFreed() - currentTime);
+                        + deviceManager.getDevice(deviceNumber).getTimeFreed() - timeToPlace);
                 sourceWaitingTime.put(requestForDevice.getSourceNumber(),
                         sourceWaitingTime.getOrDefault(requestForDevice.getSourceNumber(), 0.0) + (currentTime - requestForDevice.getGeneratedTime()));
                 devicesTime.put(deviceNumber, devicesTime.getOrDefault(deviceNumber, 0.0)
-                        + deviceManager.getDevice(deviceNumber).getTimeFreed() - currentTime);
+                        + deviceManager.getDevice(deviceNumber).getTimeFreed() - timeToPlace);
                 infoCollector.accept("Заявка от источника номер " + requestForDevice.getSourceNumber() +
-                        " загружена на прибор номер " + deviceNumber + " номер обрабатываемого пакета - " + deviceManager.getCurrentPackage() + " в " + currentTime);
+                        " загружена на прибор номер " + deviceNumber + " номер обрабатываемого пакета - " + deviceManager.getCurrentPackage());
             }
         }
     }
@@ -106,9 +108,9 @@ public class MainController {
             Request nextRequest = nextRequestPair.getSecond();
             lastRequestTime = nextRequestPair.getFirst();
             currentTime += nextRequestPair.getFirst();
+            checkFreeDevices();
             sourceRequestsCount.put(nextRequest.getSourceNumber(), sourceRequestsCount.getOrDefault(nextRequest.getSourceNumber(), 0) + 1);
             infoCollector.accept("Источник номер " + nextRequest.getSourceNumber() + " создал заявку в " + nextRequest.getGeneratedTime());
-            checkFreeDevices();
 
             if (buffer.addToBuffer(nextRequest)) {
                 infoCollector.accept("Заявка добавлена без удалений");
@@ -118,6 +120,7 @@ public class MainController {
             }
             infoCollector.accept("На данный момент в буфере заявки от следующих источников:");
             infoCollector.accept(buffer.getRequests().stream().filter(Objects::nonNull).map(Request::getSourceNumber).collect(Collectors.toList()));
+
         }
         System.out.println(devicesTime);
     }
