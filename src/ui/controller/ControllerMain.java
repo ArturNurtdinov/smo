@@ -29,8 +29,6 @@ public class ControllerMain {
     private TextField frequency;
 
     @FXML
-    private RadioButton stepmode;
-    @FXML
     private RadioButton automode;
 
     public void provideApp(App app, MainController mainController) {
@@ -38,7 +36,6 @@ public class ControllerMain {
         this.mainController = mainController;
 
         ToggleGroup modeGroup = new ToggleGroup();
-        stepmode.setToggleGroup(modeGroup);
         automode.setToggleGroup(modeGroup);
     }
 
@@ -69,11 +66,7 @@ public class ControllerMain {
             app.showErrorAlert("Неверно заполнены поля");
         }
 
-        if (stepmode.isSelected()) {
-            app.showStepModeWindow();
-        } else if (automode.isSelected()) {
-            app.showAutoModeWindow();
-        }
+        app.showAutoModeWindow();
     }
 
     public MainController getMainController() {
