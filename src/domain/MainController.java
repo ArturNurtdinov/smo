@@ -122,7 +122,6 @@ public class MainController {
             infoCollector.accept(buffer.getRequests().stream().filter(Objects::nonNull).map(Request::getSourceNumber).collect(Collectors.toList()));
 
         }
-        System.out.println(devicesTime);
     }
 
     public Map<Integer, Double> getSourceWaitingTime() {

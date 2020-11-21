@@ -5,9 +5,11 @@ import domain.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import ui.App;
-import ui.controller.model.Statistic;
+import ui.controller.model.DeviceStatistic;
+import ui.controller.model.SourceStatistic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,107 +19,98 @@ import java.util.Map;
 public class ControllerAutomode {
     private App app;
     private MainController mainController;
-    private List<Statistic> statisticList;
+    private List<SourceStatistic> statisticList;
 
     @FXML
-    private TableView<Statistic> table;
+    private TableView<SourceStatistic> tableSources;
     @FXML
-    private TableColumn<?, ?> objectColumn;
+    private TableColumn<?, ?> sourceColumn;
     @FXML
-    private TableColumn<?, ?> statNameColumn;
+    private TableColumn<?, ?> countColumn;
     @FXML
-    private TableColumn<?, ?> statColumn;
+    private TableColumn<?, ?> rejectColumn;
+    @FXML
+    private TableColumn<?, ?> inSystemColumn;
+    @FXML
+    private TableColumn<?, ?> waitingColumn;
+    @FXML
+    private TableColumn<?, ?> onDeviceColumn;
+    @FXML
+    private TableColumn<?, ?> disp4Col;
+    @FXML
+    private TableColumn<?, ?> disp5Col;
+
+    @FXML
+    private TextField deviceTimeDisp;
+    @FXML
+    private TextField waitingTimeDisp;
+
+    @FXML
+    private TableView<DeviceStatistic> devicesTable;
+    @FXML
+    private TableColumn<?, ?> deviceColumn;
+    @FXML
+    private TableColumn<?, ?> coefColumn;
 
 
     public void provideApp(App app, MainController mainController) {
         this.app = app;
         this.mainController = mainController;
         statisticList = new ArrayList<>();
-        objectColumn.setCellValueFactory(new PropertyValueFactory<>("object"));
-        statNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        statColumn.setCellValueFactory(new PropertyValueFactory<>("stat"));
+        sourceColumn.setCellValueFactory(new PropertyValueFactory<>("sourceNumber"));
+        countColumn.setCellValueFactory(new PropertyValueFactory<>("requestsCount"));
+        rejectColumn.setCellValueFactory(new PropertyValueFactory<>("rejectProb"));
+        inSystemColumn.setCellValueFactory(new PropertyValueFactory<>("inSystemTime"));
+        waitingColumn.setCellValueFactory(new PropertyValueFactory<>("waitingTime"));
+        onDeviceColumn.setCellValueFactory(new PropertyValueFactory<>("onDeviceTime"));
+        disp4Col.setCellValueFactory(new PropertyValueFactory<>("disp4"));
+        disp5Col.setCellValueFactory(new PropertyValueFactory<>("disp5"));
+        deviceColumn.setCellValueFactory(new PropertyValueFactory<>("deviceNumber"));
+        coefColumn.setCellValueFactory(new PropertyValueFactory<>("useCoef"));
         loadStat();
     }
 
     private void loadStat() {
         Map<Integer, Integer> sourceRequestsNumbers = mainController.getSourceRequestsCount();
-        sourceRequestsNumbers.keySet().forEach(key -> {
-            statisticList.add(new Statistic("Источник " + key, "Количество сгенерированных заявок",
-                    sourceRequestsNumbers.getOrDefault(key, 0)));
-        });
-
         Map<Integer, Integer> sourceRejectedCount = mainController.getSourceRejectedCount();
-        System.out.println(sourceRejectedCount);
-        sourceRejectedCount.keySet().forEach(key -> {
-            double stat = (double) sourceRejectedCount.getOrDefault(key, 0) / sourceRequestsNumbers.getOrDefault(key, 0);
-            int denominator = sourceRequestsNumbers.getOrDefault(key, 0);
-            int numerator = sourceRejectedCount.getOrDefault(key, 0);
-            if (denominator == 0 || numerator == 0) {
-                statisticList.add(new Statistic("Источник " + key, "Вероятность отказа", 0));
-            } else {
-                statisticList.add(new Statistic("Источник " + key, "Вероятность отказа", stat));
-            }
-        });
-        if (sourceRejectedCount.size() == 0) {
-            sourceRequestsNumbers.keySet().forEach(key -> {
-                statisticList.add(new Statistic("Источник " + key, "Вероятность отказа", 0));
-            });
-        }
-
-        List<Pair<Integer, Double>> systemTime = new ArrayList<>();
         Map<Integer, Double> totalSystemTime = mainController.getTotalSystemTime();
-        totalSystemTime.keySet().forEach(key -> {
-            systemTime.add(new domain.Pair<>(key,
-                    totalSystemTime.getOrDefault(key, 0.0) / sourceRequestsNumbers.getOrDefault(key, 0)));
-            statisticList.add(new Statistic("Источник " + key, "Среднее время заявок в системе",
-                    totalSystemTime.getOrDefault(key, 0.0) / sourceRequestsNumbers.getOrDefault(key, 0)));
-        });
-
-        List<Pair<Integer, Double>> waitingTime = new ArrayList<>();
         Map<Integer, Double> totalWaitingTime = mainController.getSourceWaitingTime();
-        totalWaitingTime.keySet().forEach(key -> {
-            waitingTime.add(new domain.Pair<>(key,
-                    totalWaitingTime.getOrDefault(key, 0.0) / sourceRequestsNumbers.getOrDefault(key, 0)));
-            statisticList.add(new Statistic("Источник " + key, "Среднее время ожидания заявок каждого источника в системе",
-                    totalWaitingTime.getOrDefault(key, 0.0) / sourceRequestsNumbers.getOrDefault(key, 0)));
-        });
-
         Map<Integer, Double> timeOnDevice = mainController.getTotalTimeOnDevice();
-        timeOnDevice.keySet().forEach(key -> {
-            statisticList.add(new Statistic("Источник " + key, "Среднее время обслуживания заявок источника",
-                    timeOnDevice.getOrDefault(key, 0.0) / sourceRequestsNumbers.getOrDefault(key, 0)));
-        });
 
-        // дисперсии
-        double matWait = 0.0;
-        for (Pair<Integer, Double> pair : systemTime) {
-            matWait += pair.getFirst() * pair.getSecond();
+        for (int j = 0; j < BuildConfig.SOURCE_NUMBER; j++) {
+            statisticList.add(new SourceStatistic(j));
+            // total requests
+            statisticList.get(j).setRequestsCount(sourceRequestsNumbers.getOrDefault(j, 0));
+            // rejected
+            double stat = (double) sourceRejectedCount.getOrDefault(j, 0) / sourceRequestsNumbers.getOrDefault(j, 0);
+            int denominator = sourceRequestsNumbers.getOrDefault(j, 0);
+            int numerator = sourceRejectedCount.getOrDefault(j, 0);
+            if (denominator == 0 || numerator == 0 || sourceRejectedCount.size() == 0) {
+                statisticList.get(j).setRejectProb(0);
+            } else {
+                statisticList.get(j).setRejectProb(stat);
+            }
+            // system time
+            statisticList.get(j).setInSystemTime(totalSystemTime.getOrDefault(j, 0.0) / sourceRequestsNumbers.getOrDefault(j, 0));
+            // waiting time
+            statisticList.get(j).setWaitingTime(totalWaitingTime.getOrDefault(j, 0.0) / sourceRequestsNumbers.getOrDefault(j, 0));
+            // device time
+            statisticList.get(j).setOnDeviceTime(timeOnDevice.getOrDefault(j, 0.0) / sourceRequestsNumbers.getOrDefault(j, 0));
+            // disp4
+            statisticList.get(j).setDisp4(totalWaitingTime.getOrDefault(j, 0.0) / totalSystemTime.getOrDefault(j, 0.0));
+            // disp5
+            statisticList.get(j).setDisp5(timeOnDevice.getOrDefault(j, 0.0) / totalSystemTime.getOrDefault(j, 0.0));
         }
-        double disp = 0.0;
-        for (Pair<Integer, Double> pair : systemTime) {
-            disp += pair.getFirst() * pair.getFirst() * pair.getSecond() - matWait * matWait;
-        }
 
-        statisticList.add(new Statistic("Система", "Дисперсия среднего времени ожидания заявок", disp));
 
-        matWait = 0.0;
-        disp = 0.0;
-        for (Pair<Integer, Double> pair : waitingTime) {
-            matWait += pair.getFirst() * pair.getSecond();
-        }
-        for (Pair<Integer, Double> pair : waitingTime) {
-            disp += pair.getFirst() * pair.getFirst() * pair.getSecond() - matWait * matWait;
-        }
-
-        statisticList.add(new Statistic("Система", "Дисперсия среднего времени обслуживания заявок", disp));
-
+        List<DeviceStatistic> deviceStatistics = new ArrayList<>();
         Map<Integer, Double> deviceWorkTime = mainController.getDevicesTime();
-        deviceWorkTime.keySet().forEach(key -> {
-            statisticList.add(new Statistic("Прибор " + key, "Коэффициент использования",
-                    deviceWorkTime.getOrDefault(key, 0.0) / BuildConfig.TIME_LIMIT));
-        });
+        for (int j = 0; j < BuildConfig.DEVICE_NUMBER; j++) {
+            deviceStatistics.add(new DeviceStatistic(j,
+                    deviceWorkTime.getOrDefault(j, 0.0) / BuildConfig.TIME_LIMIT));
+        }
 
-
-        table.getItems().addAll(statisticList);
+        tableSources.getItems().addAll(statisticList);
+        devicesTable.getItems().addAll(deviceStatistics);
     }
 }
