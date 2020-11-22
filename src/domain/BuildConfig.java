@@ -1,7 +1,7 @@
 package domain;
 
 public class BuildConfig {
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     public static int SOURCE_NUMBER = 3;
     public static int DEVICE_NUMBER = 3;
     public static double TIME_LIMIT = 5.0;

@@ -19,11 +19,11 @@ public class Source {
 
     public Pair<Double, Request> generate(double currentTime) {
         double nextRequestTime = getNextRequestTime(currentTime);
-        return new Pair<>(nextRequestTime, new Request(number, nextRequestNumber++, nextRequestTime));
+        return new Pair<>(nextRequestTime, new Request(number, nextRequestNumber++, currentTime + nextRequestTime));
     }
 
     private double getNextRequestTime(double currentTime) {
-        return currentTime + frequency * Math.exp(-frequency * random.nextDouble());
+        return - 1 / frequency * Math.log(random.nextDouble());
     }
 
     public double getFrequency() {

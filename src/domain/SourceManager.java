@@ -42,7 +42,7 @@ public class SourceManager {
 
     private void generateRequests(double currentTime) {
         for (int i = 0; i < sources.length; ++i) {
-            if (requestsTime[i] <= 0) {
+            if (Double.compare(requestsTime[i], 0) <= 0) {
                 Pair<Double, Request> generatedRequest = sources[i].generate(currentTime);
                 sourcesRequests[i] = generatedRequest.getSecond();
                 requestsTime[i] = generatedRequest.getFirst();

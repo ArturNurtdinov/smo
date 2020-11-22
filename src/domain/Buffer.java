@@ -67,17 +67,17 @@ public class Buffer {
         return request;
     }
 
-    public boolean addToBuffer(Request request) {
+    public Pair<Integer, Integer> addToBuffer(Request request) {
         if (requests.size() < size) {
             requests.add(indexPointer, request);
             incrementPointer();
-            return true;
+            return new Pair<>(0, -1);
         } else {
             int staticPointer = indexPointer;
             for (int i = indexPointer; i < size; i++) {
                 if (requests.get(i) == null) {
                     requests.set(i, request);
-                    return true;
+                    return new Pair<>(0, -1);
                 }
                 incrementPointer();
             }
@@ -85,7 +85,7 @@ public class Buffer {
             for (int i = 0; i < staticPointer; i++) {
                 if (requests.get(i) == null) {
                     requests.set(i, request);
-                    return true;
+                    return new Pair<>(0, -1);
                 }
                 incrementPointer();
             }
@@ -110,9 +110,10 @@ public class Buffer {
 
             if (minimalPriority == getLessPriority(minimalPriority, request.getSourceNumber())) {
                 if (requestsWithLP.values().size() == 1) {
+                    int rejectedSourceNumber = requests.get(standaloneIndex).getSourceNumber();
                     requests.set(standaloneIndex, request);
                     indexPointer = standaloneIndex;
-                    return false;
+                    return new Pair<>(1, rejectedSourceNumber);
                 } else if (requestsWithLP.size() > 0) {
                     Map.Entry<Integer, Request> toReplace = null;
                     for (Map.Entry<Integer, Request> entry : requestsWithLP.entrySet()) {
@@ -121,14 +122,23 @@ public class Buffer {
                         }
                     }
 
+                    int rejectedSourceNumber = requests.get(toReplace.getKey()).getSourceNumber();
                     requests.set(toReplace.getKey(), request);
                     indexPointer = toReplace.getKey();
-                    return false;
+                    return new Pair<>(1, rejectedSourceNumber);
                 }
             }
             indexPointer = staticPointer;
-            return false;
+            return new Pair<>(2, request.getSourceNumber());
         }
+    }
+
+    public Request getAt(int index) {
+        return requests.get(index);
+    }
+
+    public int getIndexPointer() {
+        return indexPointer;
     }
 
     public boolean isEmpty() {

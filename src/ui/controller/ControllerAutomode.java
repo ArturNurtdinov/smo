@@ -41,11 +41,6 @@ public class ControllerAutomode {
     private TableColumn<?, ?> disp5Col;
 
     @FXML
-    private TextField deviceTimeDisp;
-    @FXML
-    private TextField waitingTimeDisp;
-
-    @FXML
     private TableView<DeviceStatistic> devicesTable;
     @FXML
     private TableColumn<?, ?> deviceColumn;

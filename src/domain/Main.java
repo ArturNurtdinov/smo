@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        new MainController(null).start();
+        new MainController(Main::print).start();
     }
 
     public static void print(Object object) {

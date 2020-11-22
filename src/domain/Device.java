@@ -47,6 +47,6 @@ public class Device {
     }
 
     private double getTimeForExecution() {
-        return random.nextDouble() * (beta - alpha) + alpha;
+        return Math.random() * (beta - alpha) + alpha;
     }
 }

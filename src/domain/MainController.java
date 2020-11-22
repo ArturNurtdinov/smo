@@ -3,7 +3,6 @@ package domain;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,6 @@ public class MainController {
     private SourceManager sourceManager;
     private DeviceManager deviceManager;
     private Consumer<Object> infoCollector;
-    private double lastRequestTime;
 
     // stats
     private Map<Integer, Integer> sourceRequestsCount;
@@ -34,6 +32,8 @@ public class MainController {
     private Map<Integer, Double> totalSystemTime;
     private Map<Integer, Double> totalTimeOnDevice;
     private Map<Integer, Double> devicesTime;
+    private int replaced = 0;
+    private int rejected = 0;
 
     public MainController(Consumer<Object> infoCollector) {
         this.infoCollector = infoCollector;
@@ -92,11 +92,11 @@ public class MainController {
                 totalTimeOnDevice.put(requestForDevice.getSourceNumber(), totalTimeOnDevice.getOrDefault(requestForDevice.getSourceNumber(), 0.0)
                         + deviceManager.getDevice(deviceNumber).getTimeFreed() - timeToPlace);
                 sourceWaitingTime.put(requestForDevice.getSourceNumber(),
-                        sourceWaitingTime.getOrDefault(requestForDevice.getSourceNumber(), 0.0) + (currentTime - requestForDevice.getGeneratedTime()));
+                        sourceWaitingTime.getOrDefault(requestForDevice.getSourceNumber(), 0.0) + (timeToPlace - requestForDevice.getGeneratedTime()));
                 devicesTime.put(deviceNumber, devicesTime.getOrDefault(deviceNumber, 0.0)
                         + deviceManager.getDevice(deviceNumber).getTimeFreed() - timeToPlace);
                 infoCollector.accept("Заявка от источника номер " + requestForDevice.getSourceNumber() +
-                        " загружена на прибор номер " + deviceNumber + " номер обрабатываемого пакета - " + deviceManager.getCurrentPackage());
+                        " загружена на прибор номер " + deviceNumber + " номер обрабатываемого пакета - " + deviceManager.getCurrentPackage() + " в " + timeToPlace);
             }
         }
     }
@@ -106,22 +106,67 @@ public class MainController {
         while (currentTime < BuildConfig.TIME_LIMIT) {
             Pair<Double, Request> nextRequestPair = sourceManager.getNextRequest(currentTime);
             Request nextRequest = nextRequestPair.getSecond();
-            lastRequestTime = nextRequestPair.getFirst();
             currentTime += nextRequestPair.getFirst();
-            checkFreeDevices();
             sourceRequestsCount.put(nextRequest.getSourceNumber(), sourceRequestsCount.getOrDefault(nextRequest.getSourceNumber(), 0) + 1);
-            infoCollector.accept("Источник номер " + nextRequest.getSourceNumber() + " создал заявку в " + nextRequest.getGeneratedTime());
+            infoCollector.accept("Источник номер " + nextRequest.getSourceNumber() + " создал заявку в " + nextRequest.getGeneratedTime() + " время = " + currentTime);
 
-            if (buffer.addToBuffer(nextRequest)) {
+            Pair<Integer, Integer> statusPair = buffer.addToBuffer(nextRequest);
+            int status = statusPair.getFirst();
+            if (status == 0) {
                 infoCollector.accept("Заявка добавлена без удалений");
+            } else if (status == 1) {
+                infoCollector.accept("Заявка попала в буфер, выбив оттуда другую заявку");
+                sourceRejectedCount.put(statusPair.getSecond(), sourceRejectedCount.getOrDefault(statusPair.getSecond(), 0) + 1);
+                replaced++;
             } else {
-                sourceRejectedCount.put(nextRequest.getSourceNumber(), sourceRejectedCount.getOrDefault(nextRequest.getSourceNumber(), 0) + 1);
-                infoCollector.accept("Заявка либо попала в буфер c замещением, либо ушла в отказ сама");
+                infoCollector.accept("Заявка ушла в отказ");
+                sourceRejectedCount.put(statusPair.getSecond(), sourceRejectedCount.getOrDefault(statusPair.getSecond(), 0) + 1);
+                rejected++;
             }
-            infoCollector.accept("На данный момент в буфере заявки от следующих источников:");
-            infoCollector.accept(buffer.getRequests().stream().filter(Objects::nonNull).map(Request::getSourceNumber).collect(Collectors.toList()));
+            checkFreeDevices();
 
+            infoCollector.accept("Состояние системы:");
+            showInfo();
         }
+
+        System.out.println(sourceRejectedCount);
+        System.out.println("Всего заявок было выбито из буфера: " + replaced);
+        System.out.println("Всего отказанных заявок не попало в буффер: " + rejected);
+        int sumTotal = 0;
+        int sumRejected = 0;
+        for (int i = 0; i < sourceCount; i++) {
+            sumTotal += sourceRequestsCount.getOrDefault(i, 0);
+            sumRejected += sourceRejectedCount.getOrDefault(i, 0);
+        }
+        System.out.println("Всего = " + sumTotal);
+        System.out.println("Отклонено = " + sumRejected);
+    }
+
+    private void showInfo() {
+        System.out.println("Состояние буфера на данный момент (по источникам заявок): ");
+        System.out.println(buffer.getRequests().stream().map(request -> {
+            if (request == null) {
+                return "null";
+            } else {
+                return request.getSourceNumber();
+            }
+        }).collect(Collectors.toList()));
+
+        System.out.println("Источники на данный момент сгенерировали: ");
+        for (int i = 0; i < sourceCount; i++) {
+            System.out.println("Источник " + i + " сгенерировал " + sourceRequestsCount.getOrDefault(i, 0));
+        }
+
+        System.out.println("Приборы на данный момент: ");
+        for (int i = 0; i < deviceCount; i++) {
+            if (deviceManager.getDevice(i).isBusy()) {
+                System.out.println("Прибор " + i + " занят, освободится в " + deviceManager.getDevice(i).getTimeFreed());
+            } else {
+                System.out.println("Прибор " + i + " свободен");
+            }
+        }
+
+        infoCollector.accept("Указатель буффера на " + buffer.getIndexPointer() + " элементе");
     }
 
     public Map<Integer, Double> getSourceWaitingTime() {
