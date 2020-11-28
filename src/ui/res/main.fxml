@@ -9,13 +9,13 @@
       <Label layoutX="47.0" layoutY="113.0" text="количество источников" />
       <Label layoutX="65.0" layoutY="165.0" text="лимит времени" />
       <Label layoutX="52.0" layoutY="139.0" text="количество приборов" />
-      <TextField fx:id="bufferSizeText" layoutX="300.0" layoutY="187.0" text="12" />
+      <TextField fx:id="bufferSizeText" layoutX="300.0" layoutY="187.0" text="15" />
       <TextField fx:id="alpha" layoutX="300.0" layoutY="213.0" text="0.9" />
-      <TextField fx:id="sourceNumber" layoutX="300.0" layoutY="109.0" text="8" />
+      <TextField fx:id="sourceNumber" layoutX="300.0" layoutY="109.0" text="20" />
       <TextField fx:id="deviceNumber" layoutX="300.0" layoutY="135.0" text="3" />
       <TextField fx:id="timeLimit" layoutX="300.0" layoutY="161.0" text="50" />
       <TextField fx:id="beta" layoutX="300.0" layoutY="239.0" text="1.2" />
-      <TextField fx:id="frequency" layoutX="300.0" layoutY="265.0" text="0.4" />
+      <TextField fx:id="frequency" layoutX="300.0" layoutY="265.0" text="0.15" />
       <Label layoutX="66.0" layoutY="191.0" text="размер буфера" />
       <Label layoutX="56.0" layoutY="217.0" text="альфа для приборов" />
       <Label layoutX="60.0" layoutY="243.0" text="бета для приборов" />
