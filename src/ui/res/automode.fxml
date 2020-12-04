@@ -2,8 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="620.0" prefWidth="829.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.ControllerAutomode">
+<AnchorPane prefHeight="642.0" prefWidth="858.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.ControllerAutomode">
    <children>
       <TableView fx:id="tableSources" layoutX="11.0" layoutY="14.0" prefHeight="422.0" prefWidth="808.0">
         <columns>
@@ -23,5 +24,14 @@
           <TableColumn fx:id="coefColumn" prefWidth="307.40003967285156" text="Коэффициент использования" />
         </columns>
       </TableView>
+      <Label layoutX="433.0" layoutY="442.0" prefHeight="36.0" prefWidth="380.0" text="Состояние буфера по номерам источников на момент окончания симуляции:" textOverrun="CLIP">
+         <font>
+            <Font size="10.0" />
+         </font></Label>
+      <TextArea fx:id="bufferText" layoutX="433.0" layoutY="466.0" prefHeight="138.0" prefWidth="400.0">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </TextArea>
    </children>
 </AnchorPane>

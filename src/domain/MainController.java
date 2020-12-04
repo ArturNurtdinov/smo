@@ -185,6 +185,10 @@ public class MainController {
         return totalSystemTime;
     }
 
+    public Buffer getBuffer() {
+        return buffer;
+    }
+
     public Map<Integer, Integer> getSourceRequestsCount() {
         return sourceRequestsCount;
     }

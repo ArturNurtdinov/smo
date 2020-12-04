@@ -5,6 +5,7 @@ import domain.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import ui.App;
@@ -46,6 +47,9 @@ public class ControllerAutomode {
     private TableColumn<?, ?> deviceColumn;
     @FXML
     private TableColumn<?, ?> coefColumn;
+
+    @FXML
+    private TextArea bufferText;
 
 
     public void provideApp(App app, MainController mainController) {
@@ -107,5 +111,17 @@ public class ControllerAutomode {
 
         tableSources.getItems().addAll(statisticList);
         devicesTable.getItems().addAll(deviceStatistics);
+
+        // buffer
+        Buffer buffer = mainController.getBuffer();
+        List<String> leftRequests = new ArrayList<>(BuildConfig.BUFFER_SIZE);
+        for (int i = 0; i < buffer.getRequests().size(); i++) {
+            if (buffer.getAt(i) == null) {
+                leftRequests.add("Свободно");
+            } else {
+                leftRequests.add(buffer.getAt(i).getSourceNumber() + "");
+            }
+        }
+        bufferText.setText(leftRequests.toString());
     }
 }

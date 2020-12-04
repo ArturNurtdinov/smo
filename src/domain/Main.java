@@ -13,7 +13,8 @@ public class Main {
         if (BuildConfig.DEBUG) {
             try {
                 System.in.read();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 }
